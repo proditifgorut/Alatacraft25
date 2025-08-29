@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Alatacrat</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="bg-earth-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-4">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-natural-600 to-natural-700 px-8 py-6 text-center">
+                <h1 class="text-2xl font-playfair font-bold text-white mb-2">Alatacrat</h1>
+                <p class="text-natural-100">Masuk ke Akun Anda</p>
+            </div>
+            
+            <div class="px-8 py-6">
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-earth-700 mb-2">Email</label>
+                        <input type="email" id="email" required 
+                               class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-natural-500 focus:border-transparent"
+                               placeholder="Masukkan email Anda">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-earth-700 mb-2">Password</label>
+                        <input type="password" id="password" required
+                               class="w-full px-4 py-3 border border-earth-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-natural-500 focus:border-transparent"
+                               placeholder="Masukkan password Anda">
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="h-4 w-4 text-natural-600 focus:ring-natural-500 border-earth-300 rounded">
+                            <span class="ml-2 block text-sm text-earth-700">Ingat saya</span>
+                        </label>
+                        <a href="#" class="text-sm text-natural-600 hover:text-natural-700">Lupa password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full py-3 text-lg">
+                        Masuk
+                    </button>
+                </form>
+                
+                <div id="message" class="mt-4 text-center"></div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-earth-600">
+                        Belum punya akun? 
+                        <a href="register.html" class="text-natural-600 hover:text-natural-700 font-medium">Daftar sekarang</a>
+                    </p>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="index.html" class="text-sm text-earth-500 hover:text-earth-700">
+                        ← Kembali ke Beranda
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './src/supabaseClient.js';
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+
+            messageDiv.textContent = 'Logging in...';
+            messageDiv.className = 'text-earth-600';
+
+            const { data: { user }, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+            
+            if (error) {
+                messageDiv.textContent = `Error: ${error.message}`;
+                messageDiv.className = 'text-red-600';
+            } else if (user) {
+                const { data: profiles, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id);
+
+                if (profileError) {
+                    messageDiv.textContent = `Error fetching profile: ${profileError.message}`;
+                    messageDiv.className = 'text-red-600';
+                } else if (profiles && profiles.length > 0) {
+                    const profile = profiles[0]; // Use the first profile
+                    switch(profile.role) {
+                        case 'admin':
+                            window.location.href = 'admin-dashboard.html';
+                            break;
+                        case 'user':
+                            window.location.href = 'user-dashboard.html';
+                            break;
+                        case 'mitra':
+                            window.location.href = 'mitra-dashboard.html';
+                            break;
+                        default:
+                            window.location.href = 'index.html';
+                    }
+                } else {
+                    messageDiv.textContent = 'Login berhasil, tetapi profil tidak ditemukan.';
+                    messageDiv.className = 'text-gold-600';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

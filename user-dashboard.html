@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard User - Alatacrat</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="bg-earth-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-playfair font-bold text-gradient">Alatacrat</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-earth-600 hover:text-earth-800">Toko</a>
+                    <span class="text-earth-700">Halo, <span id="userName">User</span></span>
+                    <button id="logoutBtn" class="text-earth-600 hover:text-earth-800">Keluar</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg min-h-screen">
+            <div class="p-6">
+                <ul class="space-y-2">
+                    <li><a href="#dashboard" class="sidebar-link active" data-section="dashboard">🏠 Dashboard</a></li>
+                    <li><a href="#orders" class="sidebar-link" data-section="orders">📦 Pesanan Saya</a></li>
+                    <li><a href="#wishlist" class="sidebar-link" data-section="wishlist">❤️ Wishlist</a></li>
+                    <li><a href="#profile" class="sidebar-link" data-section="profile">👤 Profil</a></li>
+                    <li><a href="#addresses" class="sidebar-link" data-section="addresses">📍 Alamat</a></li>
+                    <li><a href="#loyalty" class="sidebar-link" data-section="loyalty">🎁 Program Loyalitas</a></li>
+                    <li><a href="#support" class="sidebar-link" data-section="support">🆘 Bantuan</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" class="flex-1 p-8">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './src/supabaseClient.js';
+
+        // Check authentication
+        async function checkAuth() {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error || !session) {
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            const { data: profiles, error: profileError } = await supabase
+                .from('profiles')
+                .select('full_name, role')
+                .eq('id', session.user.id);
+
+            if (profileError) {
+                alert('Error fetching profile: ' + profileError.message);
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            const profile = (profiles && profiles.length > 0) ? profiles[0] : null;
+
+            if (!profile || profile.role !== 'user') {
+                alert('Akses ditolak!');
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            return profile;
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
+
+        // Sidebar navigation and content rendering
+        const mainContent = document.getElementById('main-content');
+        const sections = {
+            dashboard: `
+                <h2 class="text-3xl font-playfair font-bold text-earth-800 mb-8">Selamat Datang di Alatacrat!</h2>
+                <p>Konten dashboard pengguna akan dimuat di sini.</p>
+            `,
+            orders: `<h2 class="text-3xl font-playfair font-bold text-earth-800 mb-8">Pesanan Saya</h2>`,
+            wishlist: `<h2 class="text-3xl font-playfair font-bold text-earth-800 mb-8">Wishlist Saya</h2>`,
+            profile: `<h2 class="text-3xl font-playfair font-bold text-earth-800 mb-8">Profil Saya</h2>`,
+            addresses: `<h2 class="text-3xl font-playfair font-bold text-earth-800 mb-8">Alamat Saya</h2>`,
+            loyalty: `<h2 class="text-3xl font-playfair font-bold text-earth-800 mb-8">Program Loyalitas</h2>`,
+            support: `<h2 class="text-3xl font-playfair font-bold text-earth-800 mb-8">Bantuan & Dukungan</h2>`,
+        };
+
+        function renderSection(sectionName) {
+            mainContent.innerHTML = sections[sectionName] || sections.dashboard;
+        }
+
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+                const targetSection = e.target.dataset.section;
+                renderSection(targetSection);
+            });
+        });
+
+        // Initial Load
+        (async () => {
+            const profile = await checkAuth();
+            if (profile) {
+                document.getElementById('userName').textContent = profile.full_name;
+                renderSection('dashboard');
+            }
+        })();
+    </script>
+</body>
+</html>

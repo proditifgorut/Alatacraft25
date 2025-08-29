@@ -1,0 +1,152 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-poppins text-earth-800;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-natural-600 hover:bg-natural-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply border-2 border-natural-600 text-natural-600 hover:bg-natural-600 hover:text-white px-6 py-3 rounded-lg font-medium transition-all duration-300;
+  }
+  
+  .btn-gold {
+    @apply bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden;
+  }
+  
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 py-16 lg:py-24;
+  }
+  
+  .sidebar-link {
+    @apply block w-full text-left px-4 py-3 rounded-lg text-earth-600 hover:bg-earth-50 hover:text-natural-600 transition-all duration-200;
+  }
+  
+  .sidebar-link.active {
+    @apply bg-natural-100 text-natural-700 font-medium;
+  }
+  
+  .section {
+    @apply hidden;
+  }
+  
+  .section.active {
+    @apply block;
+  }
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(142, 160, 113, 0.9) 0%, rgba(112, 129, 88, 0.95) 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #8ea071 0%, #708158 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animation classes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+/* Dashboard specific styles */
+.dashboard-card {
+  @apply bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300;
+}
+
+.stat-card {
+  @apply bg-white rounded-xl shadow-lg p-6 border-l-4 border-natural-500;
+}
+
+.table-container {
+  @apply bg-white rounded-xl shadow-lg overflow-hidden;
+}
+
+.status-badge {
+  @apply px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.status-pending {
+  @apply bg-gold-100 text-gold-800;
+}
+
+.status-confirmed {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-shipped {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.status-delivered {
+  @apply bg-emerald-100 text-emerald-800;
+}
+
+.status-cancelled {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar-link {
+    @apply text-sm;
+  }
+  
+  .dashboard-card {
+    @apply p-4;
+  }
+  
+  .table-container {
+    @apply overflow-x-auto;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8ea071;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #708158;
+}
